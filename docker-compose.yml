@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  collector:
+    image: otel/opentelemetry-collector:0.87.0
+    environment:
+      - METRICS_HOST=fake-metrics
+      - METRICS_PORT=5000
+    volumes:
+      - ./config/collector/config.yml:/etc/otelcol/config.yaml:ro
+  fake-metrics:
+    build: ./fake-metrics-generator
