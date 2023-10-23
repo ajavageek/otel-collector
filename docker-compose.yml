@@ -2,13 +2,13 @@ version: "3"
 
 services:
   collector:
-    image: otel/opentelemetry-collector:0.87.0
+    image: otel/opentelemetry-collector-contrib:0.87.0
     environment:
       - METRICS_HOST=fake-metrics
       - METRICS_PORT=5000
       - PROMETHEUS_PORT=8889
     volumes:
-      - ./config/collector/config.yml:/etc/otelcol/config.yaml:ro
+      - ./config/collector/config.yml:/etc/otelcol-contrib/config.yaml:ro
   fake-metrics:
     build: ./fake-metrics-generator
   prometheus:

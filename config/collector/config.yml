@@ -11,8 +11,35 @@ exporters:
   prometheus:
     endpoint: ":${env:PROMETHEUS_PORT}"
 
+processors:
+  metricstransform:
+    transforms:
+      - include: ^fake_(.*)$
+        match_type: regexp
+        action: update
+        operations:
+          - action: add_label
+            new_label: origin
+            new_value: fake
+      - include: ^fake_(.*)$
+        match_type: regexp
+        action: update
+        new_name: $${1}
+      - include: ^nodejs_(.*)$
+        match_type: regexp
+        action: update
+        operations:
+          - action: add_label
+            new_label: origin
+            new_value: node
+      - include: ^nodejs_(.*)$
+        match_type: regexp
+        action: update
+        new_name: $${1}
+
 service:
   pipelines:
     metrics:
       receivers: [ "prometheus" ]
+      processors: [ "metricstransform" ]
       exporters: [ "prometheus" ]
