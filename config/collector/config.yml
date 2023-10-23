@@ -8,11 +8,11 @@ receivers:
             - targets: [ "${env:METRICS_HOST}:${env:METRICS_PORT}" ]
 
 exporters:
-  logging:
-    loglevel: debug
+  prometheus:
+    endpoint: ":${env:PROMETHEUS_PORT}"
 
 service:
   pipelines:
     metrics:
       receivers: [ "prometheus" ]
-      exporters: [ "logging" ]
+      exporters: [ "prometheus" ]

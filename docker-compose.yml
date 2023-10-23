@@ -6,7 +6,22 @@ services:
     environment:
       - METRICS_HOST=fake-metrics
       - METRICS_PORT=5000
+      - PROMETHEUS_PORT=8889
     volumes:
       - ./config/collector/config.yml:/etc/otelcol/config.yaml:ro
   fake-metrics:
     build: ./fake-metrics-generator
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  grafana:
+    image: grafana/grafana:10.1.5
+    volumes:
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    ports:
+      - "3000:3000"
