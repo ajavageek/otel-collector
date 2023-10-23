@@ -9,8 +9,26 @@ services:
       - PROMETHEUS_PORT=8889
     volumes:
       - ./config/collector/config.yml:/etc/otelcol-contrib/config.yaml:ro
+      - logs:/var/logs
   fake-metrics:
     build: ./fake-metrics-generator
+  fake-logs:
+    image: mingrammer/flog:0.4.3
+    command:
+      - --format
+      - json
+      - --loop
+      - --type
+      - log
+      - --bytes
+      - "10485760"
+      - --overwrite
+      - --delay
+      - 1s
+      - --output
+      - /var/logs/generated.log
+    volumes:
+      - logs:/var/logs
   prometheus:
     image: prom/prometheus:v2.47.2
     volumes:
@@ -25,3 +43,6 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     ports:
       - "3000:3000"
+
+volumes:
+  logs:
