@@ -13,10 +13,28 @@ receivers:
         timestamp:
           parse_from: attributes.datetime
           layout: "%d/%b/%Y:%H:%M:%S %z"
+        severity:
+          parse_from: attributes.status
+          mapping:
+            error: 5xx
+            warn: 4xx
+            info: 3xx
+            debug: 2xx
+      - id: remove_body
+        type: remove
+        field: body
+      - id: remove_datetime
+        type: remove
+        field: attributes.datetime
+      - id: remove_status
+        type: remove
+        field: attributes.status
 
 exporters:
   prometheus:
     endpoint: ":${env:PROMETHEUS_PORT}"
+  loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
 
 processors:
   metricstransform:
@@ -44,18 +62,14 @@ processors:
         action: update
         new_name: $${1}
 
-connectors:
-  count:
-    requests.errors:
-      description: Number of 500 errors
-      condition: [ "status == 500 " ]
-
 service:
+  telemetry:
+    logs:
   pipelines:
     logs:
       receivers: [ "filelog" ]
-      exporters: [ "count" ]
+      exporters: [ "loki" ]
     metrics:
-      receivers: [ "prometheus", "count" ]
+      receivers: [ "prometheus" ]
       processors: [ "metricstransform" ]
       exporters: [ "prometheus" ]

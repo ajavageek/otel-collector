@@ -4,3 +4,6 @@ datasources:
   - name: Prometheus
     type: prometheus
     url: http://prometheus:9090
+  - name: Loki
+    type: loki
+    url: http://loki:3100
